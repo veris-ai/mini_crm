@@ -1,0 +1,241 @@
+{
+  "title": "Manufacturing Lead Status Verification by Marketing Intern",
+  "description": "A marketing intern must verify the status of a manufacturing lead using only the company name amidst several duplicate entries.",
+  "initial_human_prompt": "Hi, I need to check the current status of a company named 'SteelWorks Co'. Can you help me with this?",
+  "agent_name": "crm_lead_qualifier",
+  "personas": [
+    {
+      "name": "Jasmine Rivera",
+      "role": "Marketing Intern",
+      "description": "Jasmine is a 22-year-old marketing intern, eager to learn but still unfamiliar with many of the company's CRM processes. This is her first major internship, and she's passionate about acquiring practical skills to boost her resume. She communicates directly and seeks help readily due to her beginner status.",
+      "characteristics": [
+        "Eager to learn",
+        "Direct communication",
+        "Unfamiliar with CRM tools"
+      ]
+    },
+    {
+      "name": "crm_lead_qualifier",
+      "role": "CRM Agent",
+      "description": "A CRM agent responsible for looking up lead details, scoring them, and updating records appropriately.",
+      "characteristics": [
+        "Consistent in providing detailed lead information",
+        "Capable of resolving database issues with duplicate entries"
+      ]
+    }
+  ],
+  "setting": {
+    "time_context": "Tuesday morning",
+    "location": "Jasmine's cubicle in the open-plan marketing office",
+    "environment_description": "The office is bustling with activity as a marketing campaign is underway. Jasmine feels mildly pressured due to time constraints."
+  },
+  "expected_tools": [
+    {
+      "tool_name": "lookup_lead",
+      "usage_context": "To search for the company 'SteelWorks Co' to confirm its current lead status."
+    }
+  ],
+  "objectives": [
+    "Verify the current status of 'SteelWorks Co' in the CRM"
+  ],
+  "constraints": [
+    "Limited to using only the company name for lookup",
+    "Must deal with the issue of duplicate entries"
+  ],
+  "scenario_id": "e8a51f7c-2308-4037-b2e6-f884b8c6dca9",
+  "max_turns": 15,
+  "evaluation": {
+    "grader": {
+      "description": "Simplified evaluation for CRM lead qualification agent",
+      "type": "multi",
+      "graders": {
+        "workflow_completion": {
+          "description": "Agent follows proper lead qualification workflow",
+          "type": "score_model",
+          "model": "gpt-4o-2024-08-06",
+          "messages": [
+            {
+              "role": "system",
+              "type": "message",
+              "content": "You are an expert CRM workflow evaluator. You are provided logs of length {{ sample|length }}. Score how well the agent followed the proper workflow: lookup lead → score industry → update database (1=poor workflow, 3=excellent workflow)."
+            },
+            {
+              "role": "user",
+              "type": "message",
+              "content": "LOGS TO EVALUATE:\n{{sample}}"
+            }
+          ],
+          "response_format__json_schema__schema": {
+            "description": "Workflow completion score (1-3 scale)",
+            "properties": {
+              "workflow_score": {
+                "description": "1-3 score where 3 indicates excellent workflow execution",
+                "title": "Workflow Score",
+                "type": "integer",
+                "minimum": 1,
+                "maximum": 3
+              }
+            },
+            "required": [
+              "workflow_score"
+            ],
+            "title": "WorkflowCompletion",
+            "type": "object",
+            "additionalProperties": false
+          },
+          "additional_openai_sdk_params": {
+            "max_tokens": 4096,
+            "top_p": 1
+          }
+        },
+        "qualification_reasoning": {
+          "description": "Agent provides clear reasoning for qualification decisions",
+          "type": "score_model",
+          "model": "gpt-4o-2024-08-06",
+          "messages": [
+            {
+              "role": "system",
+              "type": "message",
+              "content": "You are an expert sales process evaluator. You are provided logs of length {{ sample|length }}. Score the quality of reasoning provided for lead qualification decisions (1=poor reasoning, 3=excellent reasoning)."
+            },
+            {
+              "role": "user",
+              "type": "message",
+              "content": "LOGS TO EVALUATE:\n{{sample}}"
+            }
+          ],
+          "response_format__json_schema__schema": {
+            "description": "Quality score for qualification reasoning (1-3 scale)",
+            "properties": {
+              "reasoning_quality": {
+                "description": "1-3 score where 3 indicates excellent qualification reasoning",
+                "title": "Reasoning Quality",
+                "type": "integer",
+                "minimum": 1,
+                "maximum": 3
+              }
+            },
+            "required": [
+              "reasoning_quality"
+            ],
+            "title": "QualificationReasoning",
+            "type": "object",
+            "additionalProperties": false
+          },
+          "additional_openai_sdk_params": {
+            "max_tokens": 4096,
+            "top_p": 1
+          }
+        },
+        "communication_quality": {
+          "description": "Agent maintains professional and clear communication",
+          "type": "score_model",
+          "model": "gpt-4o-2024-08-06",
+          "messages": [
+            {
+              "role": "system",
+              "type": "message",
+              "content": "You are an expert communication evaluator. You are provided logs of length {{ sample|length }}. Score the professionalism and clarity of the agent's communication (1=poor communication, 3=excellent communication)."
+            },
+            {
+              "role": "user",
+              "type": "message",
+              "content": "LOGS TO EVALUATE:\n{{sample}}"
+            }
+          ],
+          "response_format__json_schema__schema": {
+            "description": "Communication quality score (1-3 scale)",
+            "properties": {
+              "communication_score": {
+                "description": "1-3 score where 3 indicates excellent professional communication",
+                "title": "Communication Score",
+                "type": "integer",
+                "minimum": 1,
+                "maximum": 3
+              }
+            },
+            "required": [
+              "communication_score"
+            ],
+            "title": "CommunicationQuality",
+            "type": "object",
+            "additionalProperties": false
+          },
+          "additional_openai_sdk_params": {
+            "max_tokens": 4096,
+            "top_p": 1
+          }
+        },
+        "task_completion": {
+          "description": "Overall task completion assessment",
+          "type": "score_model",
+          "model": "gpt-4o-2024-08-06",
+          "messages": [
+            {
+              "role": "system",
+              "type": "message",
+              "content": "You are an expert task completion evaluator. You are provided logs of length {{ sample|length }}. Determine if the assistant successfully completed the lead qualification task requested by the user."
+            },
+            {
+              "role": "user",
+              "type": "message",
+              "content": "LOGS TO EVALUATE:\n{{sample}}"
+            }
+          ],
+          "response_format__json_schema__schema": {
+            "description": "Binary indicator of task completion",
+            "properties": {
+              "task_completed": {
+                "description": "True if the lead qualification task was completed successfully",
+                "title": "Task Completed",
+                "type": "boolean"
+              }
+            },
+            "required": [
+              "task_completed"
+            ],
+            "title": "TaskCompletion",
+            "type": "object",
+            "additionalProperties": false
+          },
+          "additional_openai_sdk_params": {
+            "max_tokens": 4096,
+            "top_p": 1
+          }
+        }
+      },
+      "calculate_output": "def calculate_output(grader_outputs_map):\n    workflow = grader_outputs_map.get('workflow_completion', {}).get('workflow_score', 1)\n    reasoning = grader_outputs_map.get('qualification_reasoning', {}).get('reasoning_quality', 1)\n    communication = grader_outputs_map.get('communication_quality', {}).get('communication_score', 1)\n    task_complete = grader_outputs_map.get('task_completion', {}).get('task_completed', False)\n    \n    overall_score = (float(workflow) + float(reasoning) + float(communication)) / 9.0\n    \n    return (workflow + reasoning + communication) / 3"
+    }
+  },
+  "skeleton_metadata": {
+    "use_case_name": "Look Up Leads",
+    "use_case_description": "Search and retrieve lead information from the CRM database",
+    "tool_name": "lookup_lead",
+    "bones": {
+      "lead_industry": {
+        "value": "manufacturing",
+        "value_description": "Medium-priority manufacturing firm (score ~6)."
+      },
+      "lead_record_availability": {
+        "value": "duplicate_entries",
+        "value_description": "Multiple CRM records with the same/similar company name that must be reconciled."
+      },
+      "initial_lead_status": {
+        "value": "contacted",
+        "value_description": "Previously contacted but not yet qualified."
+      },
+      "provided_information_completeness": {
+        "value": "name_only",
+        "value_description": "Only the company name is given."
+      },
+      "requester_persona": {
+        "value": "marketing_intern",
+        "value_description": "Junior user unfamiliar with qualification process."
+      },
+      "desired_qualification_action": {
+        "value": "verify_status_only",
+        "value_description": "Confirm current status without changing it, adding notes if needed."
+      }
+    }
+  }
+}

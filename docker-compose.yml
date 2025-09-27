@@ -1,0 +1,22 @@
+services:
+  mini_crm:
+    build: .
+    container_name: mini_crm
+    ports:
+      - "8081:8081"
+    environment:
+      - VERIS_API_URL=http://host.docker.internal:8742
+      - VERIS_API_VERSION=v3
+      - OPENAI_API_KEY=${OPENAI_API_KEY}
+      - VERIS_API_KEY=${VERIS_API_KEY}
+    env_file:
+      - .env
+    networks:
+      - veris_network
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+
+networks:
+  veris_network:
+    name: veris_network
+    driver: bridge
