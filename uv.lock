@@ -504,7 +504,7 @@ requires-dist = [
     { name = "tinydb", specifier = ">=4.8.2" },
     { name = "uvicorn", specifier = ">=0.35.0" },
     { name = "veris-ai", extras = ["fastapi", "instrument"], specifier = ">=1.10.1" },
-    { name = "veris-cli", specifier = ">=1.4.2" },
+    { name = "veris-cli", specifier = ">=1.4.3" },
 ]
 
 [[package]]
@@ -1273,7 +1273,7 @@ instrument = [
 
 [[package]]
 name = "veris-cli"
-version = "1.4.2"
+version = "1.4.3"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "httpx" },
@@ -1285,9 +1285,9 @@ dependencies = [
     { name = "tomli-w" },
     { name = "typer" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/88/c9/fd05f6d7fe4c915e521336cac05e5532c98a2ff76baa0ca231dc1a817885/veris_cli-1.4.2.tar.gz", hash = "sha256:adb206dff647ccf78343ae332df39aa45c67ee8fa4b2cd705830818bddb65775", size = 32200, upload-time = "2025-09-24T15:32:51.466Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/9f/16/75a6675c6fd32b5454a5f259a45d07a78bd7595d3a0095ea597ff8d37d7e/veris_cli-1.4.3.tar.gz", hash = "sha256:782747a2b87d55269061a55de77f58afac92b75e8051187462f2bb54adb895fb", size = 32956, upload-time = "2025-09-28T23:53:30.921Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/85/5a/ecc55ac4af0c453f9715acb64b7038accab7135ea7b850b61267e054f3fe/veris_cli-1.4.2-py3-none-any.whl", hash = "sha256:99fb4c6a0fa0593eb7acdcf40604dcb3ecfc1f258fc98e6fecdb1c07293ae94b", size = 46104, upload-time = "2025-09-24T15:32:50.28Z" },
+    { url = "https://files.pythonhosted.org/packages/94/a3/b14f393e45ad44d5f14161df016fa51f2c8787ef1df6e06a561b56cebd1e/veris_cli-1.4.3-py3-none-any.whl", hash = "sha256:03d09efd4bf6b30efa92c02f036a010a9577686fe4ef45d62b0468d85031f537", size = 46827, upload-time = "2025-09-28T23:53:29.629Z" },
 ]
 
 [[package]]
