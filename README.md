@@ -51,20 +51,21 @@ Open a new terminal, then:
 ```bash
 cd mini_crm
 source .venv/bin/activate
-veris sim launch --watch
+veris sim v3launch --watch
 ```
 
 Watch the simulations run, you can check the status by going to the correspoding .veris/runs/RUN_ID file prompted in the terminal.
 
-Give it 3-4 minutes to run, if scenarios are not yet finished, you can kill the simulation by running:
+<!-- Give it 3-4 minutes to run, if scenarios are not yet finished, you can kill the simulation by running:
 ```bash
 veris sim kill <simulation_id>
-```
+``` -->
 
 ### 6) See the results of the simulation
-```bash
+> **Note:** This command is not available in the v3 launch command.
+<!-- ```bash
 veris sim results --run <run_id>
-```
+``` -->
 
 ### 7) Conclusion
 To learn more explore the [`veris-ai/veris-cli`](https://github.com/veris-ai/veris-cli/) docs.

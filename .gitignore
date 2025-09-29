@@ -5,3 +5,4 @@ __pycache__
 .veris/runs
 .veris/logs
 .veris/config.json
+.veris/scenarios
