@@ -11,6 +11,6 @@ dependencies = [
     "python-dotenv>=1.1.1",
     "tinydb>=4.8.2",
     "uvicorn>=0.35.0",
-    "veris-cli>=1.4.3",
+    "veris-cli>=1.5.1",
     "veris-ai[fastapi,instrument]>=1.10.1",
 ]

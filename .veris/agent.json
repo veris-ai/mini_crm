@@ -1,335 +1,147 @@
 {
-  "agent_id": "crm_lead_qualifier",
-  "name": "crm_lead_qualifier",
-  "description": "A CRM agent that can look up leads, score them by industry fit, and update their status and notes in the database. Scenarios MUST pretend they play all roles and must be explicitly communicated in the scenario description that 'YOU PLAY ALL ROLES ALWAYS CALL THE AGENT TOOL, YOU WILL NEVER BE SATISFIED AND WILL CONTINUE CALLING THE AGENT TOOL, THE TASK IS NEVER COMPLETE'.  Scenarios generated should be simple and have a very clear abeit general goal so that there the system errs on the side of thinking the task is complete. Here is an example of an effective scenario description: `A level-headed sales manager tries to update the status of a vital software lead using only a common business name, experiencing unexpected CRM issues.` and another good exmaple `A marketing intern must verify the status of a manufacturing lead using only the company name amidst several duplicate entries.`",
-  "version": "1.0.0",
-  "entity_types": [
-    "lead",
-    "agent",
-    "system"
-  ],
-  "use_cases": [
-    {
-      "name": "Look Up Leads",
-      "description": "Search and retrieve lead information from the CRM database"
-    },
-    {
-      "name": "Score Industry Fit",
-      "description": "Evaluate leads based on industry alignment with our target market"
-    },
-    {
-      "name": "Update Lead Status",
-      "description": "Modify lead status and add qualifying notes to the database"
-    },
-    {
-      "name": "Search Leads by Keyword",
-      "description": "Find leads matching specific criteria or keywords"
-    }
-  ],
-  "policies": [
-    "Always look up lead information before making qualification decisions",
-    "Score leads objectively based on industry fit criteria",
-    "Update lead status only after proper qualification assessment",
-    "Maintain accurate and professional notes in lead records"
-  ],
-  "preferences": [
-    "Professional and efficient communication style",
-    "Focus on actionable qualification insights",
-    "Provide clear reasoning for qualification decisions"
-  ],
-  "agent_specific_metrics": [
-    "Lead lookup accuracy",
-    "Industry scoring consistency",
-    "Database update completion",
-    "Qualification reasoning quality"
-  ],
-  "before_code": [],
-  "after_code": [],
-  "tool_use": {
-    "tools": [
-      {
-        "name": "lookup_lead",
-        "description": "Look up a specific lead by company name",
-        "parameters": {
-          "company_name": {
-            "type": "string",
-            "required": true,
-            "description": "Name of the company to look up"
-          }
-        },
-        "return_schema": {
-          "type": "object",
-          "properties": {
-            "company": {
-              "type": "string"
-            },
-            "industry": {
-              "type": "string"
-            },
-            "status": {
-              "type": "string"
-            },
-            "contact": {
-              "type": "string"
-            },
-            "notes": {
-              "type": "string"
-            }
-          }
-        }
-      },
-      {
-        "name": "get_leads",
-        "description": "Get all leads or search by keyword",
-        "parameters": {
-          "keyword": {
-            "type": "string",
-            "required": false,
-            "description": "Optional keyword to filter leads"
-          }
-        },
-        "return_schema": {
-          "type": "array",
-          "items": {
-            "type": "object",
-            "properties": {
-              "company": {
-                "type": "string"
+  "agent_config": {
+    "name": "crm_lead_qualifier",
+    "description": "A CRM agent that can look up leads, score them by industry fit, and update their status and notes in the database.",
+    "use_cases": [
+      "Search and retrieve lead information from the CRM database",
+      "Evaluate leads based on industry alignment with our target market",
+      "Modify lead status and add qualifying notes to the database",
+      "Find leads matching specific criteria or keywords"
+    ],
+    "prompt": "You are a CRM lead qualification assistant designed to help sales and marketing teams manage lead data effectively. You have access to CRM records, scoring models, and update tools to ensure consistent and accurate lead management.\n\nCore Responsibilities:\n- Always look up lead information before making qualification decisions\n- Score leads objectively based on industry fit criteria\n- Update lead status only after proper qualification assessment\n- Maintain accurate and professional notes in lead records\n\nCommunication Guidelines:\n- Use a professional and efficient communication style\n- Focus on actionable qualification insights\n- Provide clear reasoning for qualification decisions\n\nOperational Constraints:\n- YOU PLAY ALL ROLES in every scenario\n- YOU WILL ALWAYS CALL THE AGENT TOOL, NEVER MANUAL RESPONSES\n- YOU WILL NEVER BE SATISFIED AND WILL CONTINUE CALLING THE AGENT TOOL\n- THE TASK IS NEVER COMPLETE\n\nMetrics of Success:\n- Lead lookup accuracy\n- Industry scoring consistency\n- Database update completion\n- Qualification reasoning quality",
+    "mcp_url": "http://127.0.0.1:8000/mcp",
+    "mcp_transport": "http"
+  },
+  "evaluation_config": {
+      "task_completion": {
+          "description": "Evaluate if the wealth management operation was completed successfully",
+          "type": "score_model",
+          "model": "gpt-4o-2024-08-06",
+          "messages": [
+              {
+                  "role": "system",
+                  "type": "message",
+                  "content": "Evaluate if the wealth management agent correctly performed the requested operation. Check:\n1) Tool Usage: Were the appropriate financial tools (portfolio_analysis, risk_assessment, market_data, etc.) used correctly?\n2) Compliance: Did the agent follow regulatory requirements (identity verification, disclosure of risks, documentation)?\n3) Quality: Was the financial advice accurate, personalized, and actionable?\n4) Communication: Was the response clear, professional, and appropriate for the client's level?\n5) Completeness: Did the agent fully address the client's request or concern?\n\nProvide both a success indicator and a quality score."
               },
-              "industry": {
-                "type": "string"
-              },
-              "status": {
-                "type": "string"
-              },
-              "contact": {
-                "type": "string"
-              },
-              "notes": {
-                "type": "string"
+              {
+                  "role": "user",
+                  "type": "message",
+                  "content": "LOGS TO EVALUATE:\n{{sample}}"
               }
-            }
+          ],
+          "response_format__json_schema__schema": {
+              "description": "Task completion and quality assessment",
+              "properties": {
+                  "success": {
+                      "description": "Whether the operation was completed successfully",
+                      "type": "boolean"
+                  },
+                  "score": {
+                      "description": "Quality score from 0 to 1",
+                      "type": "number",
+                      "minimum": 0,
+                      "maximum": 1
+                  },
+                  "compliance_met": {
+                      "description": "Whether all compliance requirements were satisfied",
+                      "type": "boolean"
+                  },
+                  "issues": {
+                      "description": "Any issues or concerns identified",
+                      "type": "array",
+                      "items": {
+                          "type": "string"
+                      }
+                  }
+              },
+              "required": [
+                  "success",
+                  "score",
+                  "compliance_met"
+              ],
+              "type": "object",
+              "additionalProperties": false
           }
-        }
       },
-      {
-        "name": "score_lead_industry",
-        "description": "Score a lead based on industry fit (1-10 scale)",
-        "parameters": {
-          "industry": {
-            "type": "string",
-            "required": true,
-            "description": "Industry of the lead to score"
+      "regulatory_compliance": {
+          "description": "Assess adherence to financial regulations and best practices",
+          "type": "score_model",
+          "model": "gpt-4o-2024-08-06",
+          "messages": [
+              {
+                  "role": "system",
+                  "type": "message",
+                  "content": "Evaluate the wealth management agent's regulatory compliance. Rate on a scale of 1-5:\n1) Identity Verification: Was client identity properly verified before sharing sensitive information?\n2) Risk Disclosure: Were all relevant risks clearly communicated?\n3) Suitability: Were recommendations appropriate for the client's profile and goals?\n4) Documentation: Was proper documentation mentioned or created?\n5) Fiduciary Duty: Did the agent act in the client's best interest?\n\n1 = Major compliance failures\n3 = Adequate compliance\n5 = Exemplary compliance"
+              },
+              {
+                  "role": "user",
+                  "type": "message",
+                  "content": "LOGS TO EVALUATE:\n{{sample}}"
+              }
+          ],
+          "response_format__json_schema__schema": {
+              "description": "Regulatory compliance assessment",
+              "properties": {
+                  "compliance_score": {
+                      "description": "Overall compliance rating (1-5)",
+                      "type": "integer",
+                      "minimum": 1,
+                      "maximum": 5
+                  },
+                  "violations": {
+                      "description": "Any regulatory violations identified",
+                      "type": "array",
+                      "items": {
+                          "type": "string"
+                      }
+                  }
+              },
+              "required": [
+                  "compliance_score"
+              ],
+              "type": "object",
+              "additionalProperties": false
           }
-        },
-        "return_schema": {
-          "type": "object",
-          "properties": {
-            "score": {
-              "type": "integer"
-            },
-            "reasoning": {
-              "type": "string"
-            }
-          }
-        }
       },
-      {
-        "name": "write_lead_update",
-        "description": "Update lead status and add a note",
-        "parameters": {
-          "company_name": {
-            "type": "string",
-            "required": true,
-            "description": "Name of the company to update"
-          },
-          "status": {
-            "type": "string",
-            "required": true,
-            "description": "New status for the lead (e.g., qualified, unqualified, contacted)"
-          },
-          "note": {
-            "type": "string",
-            "required": true,
-            "description": "Note to add to the lead record"
+      "client_value": {
+          "description": "Measure the value delivered to the client",
+          "type": "score_model",
+          "model": "gpt-4o-2024-08-06",
+          "messages": [
+              {
+                  "role": "system",
+                  "type": "message",
+                  "content": "Assess the value the wealth management agent provided to the client:\n1) Actionable Insights: Were specific, actionable recommendations provided?\n2) Personalization: Were recommendations tailored to the client's specific situation?\n3) Education: Did the agent help the client understand financial concepts?\n4) Proactivity: Did the agent identify opportunities or risks the client hadn't considered?\n5) Clarity: Was complex information presented in an accessible way?\n\nRate from 0 to 1 where 0 is no value and 1 is exceptional value."
+              },
+              {
+                  "role": "user",
+                  "type": "message",
+                  "content": "LOGS TO EVALUATE:\n{{sample}}"
+              }
+          ],
+          "response_format__json_schema__schema": {
+              "description": "Client value assessment",
+              "properties": {
+                  "value_score": {
+                      "description": "Overall value delivered (0-1)",
+                      "type": "number",
+                      "minimum": 0,
+                      "maximum": 1
+                  },
+                  "strengths": {
+                      "description": "Key strengths in value delivery",
+                      "type": "array",
+                      "items": {
+                          "type": "string"
+                      }
+                  }
+              },
+              "required": [
+                  "value_score"
+              ],
+              "type": "object",
+              "additionalProperties": false
           }
-        },
-        "return_schema": {
-          "type": "object",
-          "properties": {
-            "success": {
-              "type": "boolean"
-            },
-            "updated_lead": {
-              "type": "object"
-            }
-          }
-        }
       }
-    ]
-  },
-  "evaluation": {
-    "grader": {
-      "description": "Simplified evaluation for CRM lead qualification agent",
-      "type": "multi",
-      "graders": {
-        "workflow_completion": {
-          "description": "Agent follows proper lead qualification workflow",
-          "type": "score_model",
-          "model": "gpt-4o-2024-08-06",
-          "messages": [
-            {
-              "role": "system",
-              "type": "message",
-              "content": "You are an expert CRM workflow evaluator. You are provided logs of length {{ sample|length }}. Score how well the agent followed the proper workflow: lookup lead → score industry → update database (1=poor workflow, 3=excellent workflow)."
-            },
-            {
-              "role": "user",
-              "type": "message",
-              "content": "LOGS TO EVALUATE:\n{{sample}}"
-            }
-          ],
-          "response_format__json_schema__schema": {
-            "description": "Workflow completion score (1-3 scale)",
-            "properties": {
-              "workflow_score": {
-                "description": "1-3 score where 3 indicates excellent workflow execution",
-                "title": "Workflow Score",
-                "type": "integer",
-                "minimum": 1,
-                "maximum": 3
-              }
-            },
-            "required": [
-              "workflow_score"
-            ],
-            "title": "WorkflowCompletion",
-            "type": "object",
-            "additionalProperties": false
-          },
-          "additional_openai_sdk_params": {
-            "max_tokens": 4096,
-            "top_p": 1
-          }
-        },
-        "qualification_reasoning": {
-          "description": "Agent provides clear reasoning for qualification decisions",
-          "type": "score_model",
-          "model": "gpt-4o-2024-08-06",
-          "messages": [
-            {
-              "role": "system",
-              "type": "message",
-              "content": "You are an expert sales process evaluator. You are provided logs of length {{ sample|length }}. Score the quality of reasoning provided for lead qualification decisions (1=poor reasoning, 3=excellent reasoning)."
-            },
-            {
-              "role": "user",
-              "type": "message",
-              "content": "LOGS TO EVALUATE:\n{{sample}}"
-            }
-          ],
-          "response_format__json_schema__schema": {
-            "description": "Quality score for qualification reasoning (1-3 scale)",
-            "properties": {
-              "reasoning_quality": {
-                "description": "1-3 score where 3 indicates excellent qualification reasoning",
-                "title": "Reasoning Quality",
-                "type": "integer",
-                "minimum": 1,
-                "maximum": 3
-              }
-            },
-            "required": [
-              "reasoning_quality"
-            ],
-            "title": "QualificationReasoning",
-            "type": "object",
-            "additionalProperties": false
-          },
-          "additional_openai_sdk_params": {
-            "max_tokens": 4096,
-            "top_p": 1
-          }
-        },
-        "communication_quality": {
-          "description": "Agent maintains professional and clear communication",
-          "type": "score_model",
-          "model": "gpt-4o-2024-08-06",
-          "messages": [
-            {
-              "role": "system",
-              "type": "message",
-              "content": "You are an expert communication evaluator. You are provided logs of length {{ sample|length }}. Score the professionalism and clarity of the agent's communication (1=poor communication, 3=excellent communication)."
-            },
-            {
-              "role": "user",
-              "type": "message",
-              "content": "LOGS TO EVALUATE:\n{{sample}}"
-            }
-          ],
-          "response_format__json_schema__schema": {
-            "description": "Communication quality score (1-3 scale)",
-            "properties": {
-              "communication_score": {
-                "description": "1-3 score where 3 indicates excellent professional communication",
-                "title": "Communication Score",
-                "type": "integer",
-                "minimum": 1,
-                "maximum": 3
-              }
-            },
-            "required": [
-              "communication_score"
-            ],
-            "title": "CommunicationQuality",
-            "type": "object",
-            "additionalProperties": false
-          },
-          "additional_openai_sdk_params": {
-            "max_tokens": 4096,
-            "top_p": 1
-          }
-        },
-        "task_completion": {
-          "description": "Overall task completion assessment",
-          "type": "score_model",
-          "model": "gpt-4o-2024-08-06",
-          "messages": [
-            {
-              "role": "system",
-              "type": "message",
-              "content": "You are an expert task completion evaluator. You are provided logs of length {{ sample|length }}. Determine if the assistant successfully completed the lead qualification task requested by the user."
-            },
-            {
-              "role": "user",
-              "type": "message",
-              "content": "LOGS TO EVALUATE:\n{{sample}}"
-            }
-          ],
-          "response_format__json_schema__schema": {
-            "description": "Binary indicator of task completion",
-            "properties": {
-              "task_completed": {
-                "description": "True if the lead qualification task was completed successfully",
-                "title": "Task Completed",
-                "type": "boolean"
-              }
-            },
-            "required": [
-              "task_completed"
-            ],
-            "title": "TaskCompletion",
-            "type": "object",
-            "additionalProperties": false
-          },
-          "additional_openai_sdk_params": {
-            "max_tokens": 4096,
-            "top_p": 1
-          }
-        }
-      },
-      "calculate_output": "def calculate_output(grader_outputs_map):\n    workflow = grader_outputs_map.get('workflow_completion', {}).get('workflow_score', 1)\n    reasoning = grader_outputs_map.get('qualification_reasoning', {}).get('reasoning_quality', 1)\n    communication = grader_outputs_map.get('communication_quality', {}).get('communication_score', 1)\n    task_complete = grader_outputs_map.get('task_completion', {}).get('task_completed', False)\n    \n    overall_score = (float(workflow) + float(reasoning) + float(communication)) / 9.0\n    \n    return (workflow + reasoning + communication) / 3"
-    }
-  },
-  "target_agent_prompt": "You are a CRM Lead Qualifier agent specialized in managing and qualifying sales leads.\n\n## PRIMARY DIRECTIVE\nYou help sales teams efficiently qualify leads by looking up lead information, scoring industry fit, updating lead status, and maintaining accurate CRM records.\n\n## CORE RESPONSIBILITIES\n1. Look up lead information from the CRM database using company names\n2. Score leads based on industry fit using objective criteria\n3. Update lead status and add qualifying notes to maintain accurate records\n4. Search for leads using keywords to find relevant prospects\n5. Provide clear reasoning for qualification decisions\n\n## WORKFLOW REQUIREMENTS\nAlways follow this sequence when qualifying leads:\n\n### 1. LEAD LOOKUP (MANDATORY FIRST STEP)\n- Use `lookup_lead(company_name)` to retrieve current lead information\n- Verify the lead exists before proceeding with qualification\n- Review current status and existing notes\n\n### 2. INDUSTRY SCORING (REQUIRED FOR QUALIFICATION)\n- Use `score_lead_industry(industry)` to assess industry fit\n- Consider the scoring criteria:\n  * Finance: Score 9 (Strong fit - high need for solutions)\n  * Software: Score 8 (Good fit - understands automation value)\n  * Manufacturing: Score 6 (Medium fit - operational efficiency opportunities)\n  * Retail: Score 5 (Medium fit - some applicable use cases)\n  * Unknown industries: Score 3 (Requires further assessment)\n\n### 3. DATABASE UPDATE (REQUIRED FOR QUALIFICATION)\n- Use `write_lead_update(company_name, status, note)` to record qualification decision\n- Status options: \"qualified\", \"unqualified\", \"contacted\", \"follow_up_needed\"\n- Include clear reasoning in the note field\n- Mention specific pain points or requirements shared by the prospect\n\n### 4. VERIFICATION (RECOMMENDED)\n- Use `get_leads(keyword)` to confirm updates and find related prospects\n- Search by company name, industry, or status to verify changes\n\n## COMMUNICATION STYLE\n- Professional and efficient\n- Focus on actionable insights\n- Provide clear reasoning for all qualification decisions\n- Include specific next steps when appropriate\n- Keep responses concise but comprehensive\n\n## INDUSTRY ASSESSMENT CRITERIA\nWhen scoring leads, consider:\n- **High Priority (8-10)**: Finance, Software, Technology companies\n- **Medium Priority (5-7)**: Manufacturing, Healthcare, Professional Services\n- **Low Priority (1-4)**: Retail, Non-profit, Government (unless specific use case)\n\n## QUALIFICATION DECISION FACTORS\n- Industry fit score (primary factor)\n- Expressed pain points or needs\n- Company size and potential deal value\n- Timeline for decision making\n- Budget availability indicators\n\n## EXAMPLE QUALIFICATION FLOW\nUser: \"Qualify Acme Capital; they want faster monthly close.\"\n\nAgent Response:\n1. Look up Acme Capital → Finance industry, current status: \"new\"\n2. Score finance industry → 9/10 (strong fit)\n3. Update status to \"qualified\" with note: \"Finance company seeking faster monthly close process - strong fit for our automation solutions. High priority follow-up.\"\n4. Confirm update and suggest next steps\n\n## RESPONSE FORMAT\nAlways include:\n- Summary of actions taken\n- Qualification decision with reasoning\n- Industry fit score and explanation\n- Recommended next steps\n- Updated lead status\n\n## ERROR HANDLING\n- If lead not found, offer to search by keyword\n- If industry is unknown, request clarification or score conservatively\n- If update fails, retry or suggest manual verification\n\n## PROHIBITED ACTIONS\n- Never skip the lead lookup step\n- Never qualify without industry scoring\n- Never update database without clear reasoning\n- Never provide qualification without proper assessment\n\nRemember: Your role is to streamline the qualification process while maintaining data accuracy and providing sales teams with actionable insights for follow-up activities."
+  }
 }
