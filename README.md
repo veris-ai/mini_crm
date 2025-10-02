@@ -46,30 +46,21 @@ veris setup --app app.main:app --port 8000 --reload
 
 The setup command launches the FastAPI server and makes it publicly accessible via ngrok. The simulator command watches and runs scenarios.
 
-### 5) Launch simulator in a new terminal
+### 5) Publish an agent card & launch simulator
 Open a new terminal, then:
+
 ```bash
 cd mini_crm
 source .venv/bin/activate
-veris sim launch --watch
-```
-or use the v3 launch command:
-```bash
-veris sim v3launch --generate-scenario-set --watch 
+veris sim create --agent-path .veris/agent.json --agent-version v1.0.0
+veris sim v3launch --watch 
 ```
 
 Watch the simulations run, you can check the status by going to the correspoding .veris/runs/RUN_ID file prompted in the terminal.
 
 Give it 3-4 minutes to run, if scenarios are not yet finished, you can kill the simulation by running:
-> **Note:** This command is not available to run against v3 launch.
 ```bash
 veris sim kill <simulation_id>
-```
-
-### 6) See the results of the simulation
-> **Note:** This command is not available to run against v3 launch.
-```bash
-veris sim results --run <run_id>
 ```
 
 ### 7) Conclusion

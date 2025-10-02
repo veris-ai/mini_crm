@@ -6,3 +6,5 @@ __pycache__
 .veris/logs
 .veris/config.json
 .veris/scenarios
+
+uv.lock

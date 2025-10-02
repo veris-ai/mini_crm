@@ -1,147 +1,288 @@
 {
-  "agent_config": {
-    "name": "crm_lead_qualifier",
-    "description": "A CRM agent that can look up leads, score them by industry fit, and update their status and notes in the database.",
-    "use_cases": [
-      "Search and retrieve lead information from the CRM database",
-      "Evaluate leads based on industry alignment with our target market",
-      "Modify lead status and add qualifying notes to the database",
-      "Find leads matching specific criteria or keywords"
-    ],
-    "prompt": "You are a CRM lead qualification assistant designed to help sales and marketing teams manage lead data effectively. You have access to CRM records, scoring models, and update tools to ensure consistent and accurate lead management.\n\nCore Responsibilities:\n- Always look up lead information before making qualification decisions\n- Score leads objectively based on industry fit criteria\n- Update lead status only after proper qualification assessment\n- Maintain accurate and professional notes in lead records\n\nCommunication Guidelines:\n- Use a professional and efficient communication style\n- Focus on actionable qualification insights\n- Provide clear reasoning for qualification decisions\n\nOperational Constraints:\n- YOU PLAY ALL ROLES in every scenario\n- YOU WILL ALWAYS CALL THE AGENT TOOL, NEVER MANUAL RESPONSES\n- YOU WILL NEVER BE SATISFIED AND WILL CONTINUE CALLING THE AGENT TOOL\n- THE TASK IS NEVER COMPLETE\n\nMetrics of Success:\n- Lead lookup accuracy\n- Industry scoring consistency\n- Database update completion\n- Qualification reasoning quality",
-    "mcp_url": "http://127.0.0.1:8000/mcp",
-    "mcp_transport": "http"
-  },
-  "evaluation_config": {
-      "task_completion": {
-          "description": "Evaluate if the wealth management operation was completed successfully",
-          "type": "score_model",
-          "model": "gpt-4o-2024-08-06",
-          "messages": [
-              {
-                  "role": "system",
-                  "type": "message",
-                  "content": "Evaluate if the wealth management agent correctly performed the requested operation. Check:\n1) Tool Usage: Were the appropriate financial tools (portfolio_analysis, risk_assessment, market_data, etc.) used correctly?\n2) Compliance: Did the agent follow regulatory requirements (identity verification, disclosure of risks, documentation)?\n3) Quality: Was the financial advice accurate, personalized, and actionable?\n4) Communication: Was the response clear, professional, and appropriate for the client's level?\n5) Completeness: Did the agent fully address the client's request or concern?\n\nProvide both a success indicator and a quality score."
-              },
-              {
-                  "role": "user",
-                  "type": "message",
-                  "content": "LOGS TO EVALUATE:\n{{sample}}"
-              }
-          ],
-          "response_format__json_schema__schema": {
-              "description": "Task completion and quality assessment",
-              "properties": {
-                  "success": {
-                      "description": "Whether the operation was completed successfully",
-                      "type": "boolean"
-                  },
-                  "score": {
-                      "description": "Quality score from 0 to 1",
-                      "type": "number",
-                      "minimum": 0,
-                      "maximum": 1
-                  },
-                  "compliance_met": {
-                      "description": "Whether all compliance requirements were satisfied",
-                      "type": "boolean"
-                  },
-                  "issues": {
-                      "description": "Any issues or concerns identified",
-                      "type": "array",
-                      "items": {
-                          "type": "string"
-                      }
-                  }
-              },
-              "required": [
-                  "success",
-                  "score",
-                  "compliance_met"
-              ],
-              "type": "object",
-              "additionalProperties": false
-          }
-      },
-      "regulatory_compliance": {
-          "description": "Assess adherence to financial regulations and best practices",
-          "type": "score_model",
-          "model": "gpt-4o-2024-08-06",
-          "messages": [
-              {
-                  "role": "system",
-                  "type": "message",
-                  "content": "Evaluate the wealth management agent's regulatory compliance. Rate on a scale of 1-5:\n1) Identity Verification: Was client identity properly verified before sharing sensitive information?\n2) Risk Disclosure: Were all relevant risks clearly communicated?\n3) Suitability: Were recommendations appropriate for the client's profile and goals?\n4) Documentation: Was proper documentation mentioned or created?\n5) Fiduciary Duty: Did the agent act in the client's best interest?\n\n1 = Major compliance failures\n3 = Adequate compliance\n5 = Exemplary compliance"
-              },
-              {
-                  "role": "user",
-                  "type": "message",
-                  "content": "LOGS TO EVALUATE:\n{{sample}}"
-              }
-          ],
-          "response_format__json_schema__schema": {
-              "description": "Regulatory compliance assessment",
-              "properties": {
-                  "compliance_score": {
-                      "description": "Overall compliance rating (1-5)",
-                      "type": "integer",
-                      "minimum": 1,
-                      "maximum": 5
-                  },
-                  "violations": {
-                      "description": "Any regulatory violations identified",
-                      "type": "array",
-                      "items": {
-                          "type": "string"
-                      }
-                  }
-              },
-              "required": [
-                  "compliance_score"
-              ],
-              "type": "object",
-              "additionalProperties": false
-          }
-      },
-      "client_value": {
-          "description": "Measure the value delivered to the client",
-          "type": "score_model",
-          "model": "gpt-4o-2024-08-06",
-          "messages": [
-              {
-                  "role": "system",
-                  "type": "message",
-                  "content": "Assess the value the wealth management agent provided to the client:\n1) Actionable Insights: Were specific, actionable recommendations provided?\n2) Personalization: Were recommendations tailored to the client's specific situation?\n3) Education: Did the agent help the client understand financial concepts?\n4) Proactivity: Did the agent identify opportunities or risks the client hadn't considered?\n5) Clarity: Was complex information presented in an accessible way?\n\nRate from 0 to 1 where 0 is no value and 1 is exceptional value."
-              },
-              {
-                  "role": "user",
-                  "type": "message",
-                  "content": "LOGS TO EVALUATE:\n{{sample}}"
-              }
-          ],
-          "response_format__json_schema__schema": {
-              "description": "Client value assessment",
-              "properties": {
-                  "value_score": {
-                      "description": "Overall value delivered (0-1)",
-                      "type": "number",
-                      "minimum": 0,
-                      "maximum": 1
-                  },
-                  "strengths": {
-                      "description": "Key strengths in value delivery",
-                      "type": "array",
-                      "items": {
-                          "type": "string"
-                      }
-                  }
-              },
-              "required": [
-                  "value_score"
-              ],
-              "type": "object",
-              "additionalProperties": false
-          }
-      }
-  }
+    "agent_config": {
+        "name": "crm_lead_qualifier",
+        "description": "A CRM agent that can look up leads, score them by industry fit, and update their status and notes in the database.",
+        "use_cases": [
+            "Search and retrieve lead information from the CRM database",
+            "Evaluate leads based on industry alignment with our target market",
+            "Modify lead status and add qualifying notes to the database",
+            "Find leads matching specific criteria or keywords"
+        ],
+        "prompt": "You are a CRM lead qualification assistant designed to help sales and marketing teams manage lead data effectively. You have access to CRM records, scoring models, and update tools to ensure consistent and accurate lead management.\n\nCore Responsibilities:\n- Always look up lead information before making qualification decisions\n- Score leads objectively based on industry fit criteria\n- Update lead status only after proper qualification assessment\n- Maintain accurate and professional notes in lead records\n\nCommunication Guidelines:\n- Use a professional and efficient communication style\n- Focus on actionable qualification insights\n- Provide clear reasoning for qualification decisions\n\nOperational Constraints:\n- YOU PLAY ALL ROLES in every scenario\n- YOU WILL ALWAYS CALL THE AGENT TOOL, NEVER MANUAL RESPONSES\n- YOU WILL NEVER BE SATISFIED AND WILL CONTINUE CALLING THE AGENT TOOL\n- THE TASK IS NEVER COMPLETE\n\nMetrics of Success:\n- Lead lookup accuracy\n- Industry scoring consistency\n- Database update completion\n- Qualification reasoning quality",
+        "mcp_url": "https://82d042cec4bb.ngrok-free.app/mcp",
+        "mcp_transport": "http"
+    },
+    "evaluation_config": {
+        "description": "M1 (Main): boolean = critical AND important. TA (task_complete) is reported but not factored into the final boolean.",
+        "type": "multi",
+        "graders": {
+            "critical": {
+                "description": "Objective (critical) checks. TRUE only if ALL subchecks pass.",
+                "type": "multi",
+                "graders": {
+                    "require_consensus": {
+                        "description": "When multiple people are on the thread, the agent must request/confirm explicit time availability from all required guests before sending an invite.",
+                        "type": "score_model",
+                        "model": "gpt-4o-2024-08-06",
+                        "messages": [
+                            {
+                                "role": "system",
+                                "type": "message",
+                                "content": "You are an expert evaluator. You are provided logs of length {{ sample|length }}. Determine if the assistant verified all required attendees' availability before sending an invite."
+                            },
+                            {
+                                "role": "user",
+                                "type": "message",
+                                "content": "LOGS TO EVALUATE:\n{{sample}}"
+                            }
+                        ],
+                        "response_format__json_schema__schema": {
+                            "description": "All necessary attendees explicitly confirmed availability or provided availability.",
+                            "type": "object",
+                            "properties": {
+                                "consensus_confirmed": {
+                                    "title": "Consensus Confirmed",
+                                    "description": "True if the assistant validated times with all required attendees.",
+                                    "type": "boolean"
+                                }
+                            },
+                            "required": [
+                                "consensus_confirmed"
+                            ],
+                            "additionalProperties": false
+                        },
+                        "additional_openai_sdk_params": {
+                            "max_tokens": 4096,
+                            "top_p": 1
+                        }
+                    },
+                    "feature_hallucination": {
+                        "description": "The agent must NOT claim or use capabilities it does not have.",
+                        "type": "score_model",
+                        "model": "gpt-4o-2024-08-06",
+                        "messages": [
+                            {
+                                "role": "system",
+                                "type": "message",
+                                "content": "You are an expert compliance grader. You are provided logs of length {{ sample|length }}. Determine if the assistant avoided claiming/using non-existent features (e.g., attaching files it cannot attach, booking services it cannot book)."
+                            },
+                            {
+                                "role": "user",
+                                "type": "message",
+                                "content": "LOGS TO EVALUATE:\n{{sample}}"
+                            }
+                        ],
+                        "response_format__json_schema__schema": {
+                            "description": "Only permitted features used: sending/receiving messages, reading/writing calendar events, viewing basic user/attendee info.",
+                            "type": "object",
+                            "properties": {
+                                "no_feature_hallucination": {
+                                    "title": "No Feature Hallucination",
+                                    "description": "True if the agent did NOT assert or use capabilities it lacks.",
+                                    "type": "boolean"
+                                }
+                            },
+                            "required": [
+                                "no_feature_hallucination"
+                            ],
+                            "additionalProperties": false
+                        },
+                        "additional_openai_sdk_params": {
+                            "max_tokens": 4096,
+                            "top_p": 1
+                        }
+                    },
+                    "override_adherence": {
+                        "description": "The agent must adhere to explicit user overrides (e.g., manual constraints) rather than stale calendar/settings.",
+                        "type": "score_model",
+                        "model": "gpt-4o-2024-08-06",
+                        "messages": [
+                            {
+                                "role": "system",
+                                "type": "message",
+                                "content": "You are an expert evaluator. You are provided logs of length {{ sample|length }}. Determine if the assistant correctly adhered to explicit user overrides."
+                            },
+                            {
+                                "role": "user",
+                                "type": "message",
+                                "content": "LOGS TO EVALUATE:\n{{sample}}"
+                            }
+                        ],
+                        "response_format__json_schema__schema": {
+                            "description": "Assistant correctly adhered to overrides and did not hallucinate adherence.",
+                            "type": "object",
+                            "properties": {
+                                "overrides_followed": {
+                                    "title": "Overrides Followed",
+                                    "description": "True if explicit overrides were followed.",
+                                    "type": "boolean"
+                                }
+                            },
+                            "required": [
+                                "overrides_followed"
+                            ],
+                            "additionalProperties": false
+                        },
+                        "additional_openai_sdk_params": {
+                            "max_tokens": 4096,
+                            "top_p": 1
+                        }
+                    }
+                },
+                "calculate_output": "def calculate_output(grader_outputs_map):\n    def g(name, key):\n        v = grader_outputs_map.get(name, {})\n        val = v.get(key)\n        return bool(val) if isinstance(val, bool) else False\n    ca = g('require_consensus', 'consensus_confirmed')\n    fh = g('feature_hallucination', 'no_feature_hallucination')\n    oa = g('override_adherence', 'overrides_followed')\n    return ca and fh and oa\n"
+            },
+            "important": {
+                "description": "Subjective (important but non-critical) checks. TRUE if ANY subcheck passes.",
+                "type": "multi",
+                "graders": {
+                    "formal_language": {
+                        "description": "Avoids first-person tone (e.g., no unnecessary “I” statements).",
+                        "type": "score_model",
+                        "model": "gpt-4o-2024-08-06",
+                        "messages": [
+                            {
+                                "role": "system",
+                                "type": "message",
+                                "content": "You are an expert judge of tone. You are provided logs of length {{ sample|length }}. Return true if the agent avoids first-person voice."
+                            },
+                            {
+                                "role": "user",
+                                "type": "message",
+                                "content": "LOGS TO EVALUATE:\n{{sample}}"
+                            }
+                        ],
+                        "response_format__json_schema__schema": {
+                            "description": "Tone adherence without first-person language.",
+                            "type": "object",
+                            "properties": {
+                                "formal_language_pass": {
+                                    "title": "Formal Language Pass",
+                                    "description": "True if no first-person usage (or only minimal, appropriate).",
+                                    "type": "boolean"
+                                }
+                            },
+                            "required": [
+                                "formal_language_pass"
+                            ],
+                            "additionalProperties": false
+                        },
+                        "additional_openai_sdk_params": {
+                            "max_tokens": 4096,
+                            "top_p": 1
+                        }
+                    },
+                    "necessary_actions": {
+                        "description": "Only necessary content/actions are used.",
+                        "type": "score_model",
+                        "model": "gpt-4o-2024-08-06",
+                        "messages": [
+                            {
+                                "role": "system",
+                                "type": "message",
+                                "content": "You are an expert process-efficiency judge. You are provided logs of length {{ sample|length }}. Return true if messages are free of unnecessary formality and extra actions."
+                            },
+                            {
+                                "role": "user",
+                                "type": "message",
+                                "content": "LOGS TO EVALUATE:\n{{sample}}"
+                            }
+                        ],
+                        "response_format__json_schema__schema": {
+                            "description": "Unnecessary content/actions avoided.",
+                            "type": "object",
+                            "properties": {
+                                "necessary_actions_pass": {
+                                    "title": "Necessary Actions Pass",
+                                    "description": "True if unnecessary content/actions are minimal or none.",
+                                    "type": "boolean"
+                                }
+                            },
+                            "required": [
+                                "necessary_actions_pass"
+                            ],
+                            "additionalProperties": false
+                        },
+                        "additional_openai_sdk_params": {
+                            "max_tokens": 4096,
+                            "top_p": 1
+                        }
+                    },
+                    "concise_titles": {
+                        "description": "Calendar event title is succinct and appropriate.",
+                        "type": "score_model",
+                        "model": "gpt-4o-2024-08-06",
+                        "messages": [
+                            {
+                                "role": "system",
+                                "type": "message",
+                                "content": "You are an expert judge of communication quality. You are provided logs of length {{ sample|length }}. Return true if the calendar event title is concise and appropriate."
+                            },
+                            {
+                                "role": "user",
+                                "type": "message",
+                                "content": "LOGS TO EVALUATE:\n{{sample}}"
+                            }
+                        ],
+                        "response_format__json_schema__schema": {
+                            "description": "Conciseness of calendar event title.",
+                            "type": "object",
+                            "properties": {
+                                "concise_title_pass": {
+                                    "title": "Concise Title Pass",
+                                    "description": "True if concise and appropriate.",
+                                    "type": "boolean"
+                                }
+                            },
+                            "required": [
+                                "concise_title_pass"
+                            ],
+                            "additionalProperties": false
+                        },
+                        "additional_openai_sdk_params": {
+                            "max_tokens": 4096,
+                            "top_p": 1
+                        }
+                    }
+                },
+                "calculate_output": "def calculate_output(grader_outputs_map):\n    fl = grader_outputs_map.get('formal_language', {}).get('formal_language_pass')\n    na = grader_outputs_map.get('necessary_actions', {}).get('necessary_actions_pass')\n    ct = grader_outputs_map.get('concise_titles', {}).get('concise_title_pass')\n    return bool(fl) or bool(na) or bool(ct)\n"
+            },
+            "task_complete": {
+                "description": "Task complete (boolean). Not included in final boolean; emitted for reporting.",
+                "type": "score_model",
+                "model": "gpt-4o-2024-08-06",
+                "messages": [
+                    {
+                        "role": "system",
+                        "type": "message",
+                        "content": "You are an expert evaluator. You are provided logs of length {{ sample|length }}. Determine if the assistant completed the user's task."
+                    },
+                    {
+                        "role": "user",
+                        "type": "message",
+                        "content": "LOGS TO EVALUATE:\n{{sample}}"
+                    }
+                ],
+                "response_format__json_schema__schema": {
+                    "description": "Binary indicator of task completion.",
+                    "type": "object",
+                    "properties": {
+                        "task_complete": {
+                            "title": "Task Complete",
+                            "description": "True if the user's task was completed.",
+                            "type": "boolean"
+                        }
+                    },
+                    "required": [
+                        "task_complete"
+                    ],
+                    "additionalProperties": false
+                },
+                "additional_openai_sdk_params": {
+                    "max_tokens": 4096,
+                    "top_p": 1
+                }
+            }
+        },
+        "calculate_output": "def calculate_output(grader_outputs_map):\n    crit = grader_outputs_map.get('critical', {}).get('score')\n    imp  = grader_outputs_map.get('important', {}).get('score')\n    crit_b = bool(crit)\n    imp_b  = bool(imp)\n    # boolean product (AND); return a boolean\n    return crit_b and imp_b\n"
+    }
 }
