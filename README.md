@@ -52,11 +52,19 @@ Open a new terminal, then:
 ```bash
 cd mini_crm
 source .venv/bin/activate
-veris sim create --agent-path .veris/agent.json --agent-version v1.0.0
+```
+
+Create a new agent card:
+```bash
+veris sim create --agent-path agent_card.json --agent-version v1.0.0
+```
+
+Launch the simulation:
+```bash
 veris sim v3launch --watch 
 ```
 
-Watch the simulations run, you can check the status by going to the correspoding .veris/runs/RUN_ID file prompted in the terminal.
+Watch the simulation run, you can check the status by going to the correspoding .veris/runs/RUN_ID file prompted in the terminal.
 
 Give it 3-4 minutes to run, if scenarios are not yet finished, you can kill the simulation by running:
 ```bash
