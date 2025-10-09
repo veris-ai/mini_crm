@@ -8,14 +8,8 @@ from .schema import ChatRequest, ChatResponse
 from . import get_crm_chat_service
 
 from veris_ai import veris
-from veris_ai import init_observability, instrument_fastapi_app
 
 load_dotenv()
-
-if os.getenv("OTEL_SERVICE_NAME") == 'mini_crm':
-    init_observability()
-else:
-    print("Not initializing observability")
 
 app = FastAPI(title="Mini CRM Lead Qualifier")
 
@@ -37,11 +31,6 @@ async def chat(req: ChatRequest) -> ChatResponse:
         )
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
-
-if os.getenv("OTEL_SERVICE_NAME") == 'mini_crm':
-    instrument_fastapi_app(app)
-else:
-    print("Not instrumenting fastapi app")
 
 veris.set_fastapi_mcp(fastapi=app)
 veris.fastapi_mcp.mount_http()
