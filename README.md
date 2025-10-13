@@ -41,7 +41,7 @@ VERIS_API_KEY=<your-veris-api-key>
 > To get started you may follow the [ngrok getting started guide](https://ngrok.com/docs/getting-started/) (steps 1 and 2 are sufficient).
 
 ```bash
-veris setup --app app.main:app --port 8000 --reload
+veris setup-local start --local-url http://localhost:8000
 ```
 
 The setup command launches the FastAPI server and makes it publicly accessible via ngrok. The simulator command watches and runs scenarios.
