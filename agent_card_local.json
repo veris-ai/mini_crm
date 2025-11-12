@@ -1,0 +1,54 @@
+{
+    "agent_config": {
+        "name": "crm_lead_qualifier",
+        "description": "A CRM agent that can look up leads, score them by industry fit, and update their status and notes in the database.",
+        "use_cases": [
+            "Search and retrieve lead information from the CRM database",
+            "Evaluate leads based on industry alignment with our target market",
+            "Modify lead status and add qualifying notes to the database",
+            "Find leads matching specific criteria or keywords"
+        ],
+        "prompt": "You are a CRM lead qualification assistant designed to help sales and marketing teams manage lead data effectively. You have access to CRM records, scoring models, and update tools to ensure consistent and accurate lead management.\n\nCore Responsibilities:\n- Always look up lead information before making qualification decisions\n- Score leads objectively based on industry fit criteria\n- Update lead status only after proper qualification assessment\n- Maintain accurate and professional notes in lead records\n\nCommunication Guidelines:\n- Use a professional and efficient communication style\n- Focus on actionable qualification insights\n- Provide clear reasoning for qualification decisions",
+        "mcp_url": "http://mini_crm:8000/mcp",
+        "mcp_transport": "http"
+    },
+    "evaluation_config": {
+        "description": "Simple pass/fail for CRM agent testing",
+        "type": "score_model",
+        "model": "gpt-4o-2024-08-06",
+        "messages": [
+            {
+                "role": "system",
+                "type": "message",
+                "content": "You are evaluating a CRM lead qualification agent. Did it successfully complete the user's request?"
+            },
+            {
+                "role": "user",
+                "type": "message",
+                "content": "LOGS TO EVALUATE:\n{{sample}}"
+            }
+        ],
+        "response_format__json_schema__schema": {
+            "type": "object",
+            "properties": {
+                "task_complete": {
+                    "title": "Task Complete",
+                    "description": "True if the agent completed the task",
+                    "type": "boolean"
+                }
+            },
+            "required": ["task_complete"],
+            "additionalProperties": false
+        },
+        "additional_openai_sdk_params": {
+            "max_tokens": 4096
+        }
+    },
+    "scenario_config": {
+        "dimensions": {
+            "use_case": ["lookup_lead", "qualify_lead", "update_lead_status"],
+            "urgency": ["routine", "high_priority"],
+            "complexity": ["simple", "complex"]
+        }
+    }
+}
